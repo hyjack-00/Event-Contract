@@ -9,7 +9,7 @@ import numpy as np
 BASE_URL = "https://api.binance.com/api/v3/klines"
 
 # 预定义的时间间隔
-INTERVALS = ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "8h", "1d"]
+INTERVALS = ["1m", "5m", "15m", "30m", "1h", "2h", "4h", "8h"]
 
 # 获取 K 线数据
 def fetch_klines(symbol="BTCUSDT", interval="1h", lookback_days=180, end_time=None):

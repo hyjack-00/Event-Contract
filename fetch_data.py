@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 import numpy as np
 
 # Binance API 获取 K 线数据
-BASE_URL = "https://api.binance.com/api/v3/klines"
+BASE_URL = "https://fapi.binance.com/fapi/v3/klines"
 
 # 预定义的时间间隔
-INTERVALS = ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "8h", "1d"]
+INTERVALS = ["1m", "5m", "15m", "30m", "1h", "2h", "4h", "8h"]
 
 # 获取 K 线数据
 def fetch_klines(symbol="BTCUSDT", interval="1h", lookback_days=180, end_time=None):
@@ -37,6 +37,7 @@ def fetch_klines(symbol="BTCUSDT", interval="1h", lookback_days=180, end_time=No
             "endTime": end_time,
             "limit": 1000
         }
+        
         response = requests.get(BASE_URL, params=params)
         data = response.json()
         
@@ -53,12 +54,9 @@ def fetch_klines(symbol="BTCUSDT", interval="1h", lookback_days=180, end_time=No
     ])
     
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
-    # 仅对数值型列进行 float 转换
-    numeric_cols = ["open", "high", "low", "close", "volume"]
-    df[numeric_cols] = df[numeric_cols].astype(float)
+    df = df[["timestamp", "open", "high", "low", "close", "volume"]].astype(float)
     
     return df
-
 
 # 批量获取所有 interval 的数据
 def fetch_all_intervals(symbol="BTCUSDT", lookback_days=30, end_time=None, save_path="btc_klines.npz"):
@@ -74,13 +72,26 @@ def fetch_all_intervals(symbol="BTCUSDT", lookback_days=30, end_time=None, save_
     np.savez(save_path, **{k: v.to_numpy() for k, v in data_dict.items()})
     print(f"Data saved to {save_path}")
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Fetch Kline data from Binance")
-    parser.add_argument("--symbol", type=str, default="BTCUSDT", help="Trading pair")
-    parser.add_argument("--lookback_days", type=int, default=30, help="Lookback days")
-    parser.add_argument("--end_time", type=str, default=None, help="End time")
-    parser.add_argument("--save_path", type=str, default="btc_klines.npz", help="Save path")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--symbol',
+        type=str,
+        default='BTCUSDT',
+        help='Trading pair'
+    )
+    parser.add_argument(
+        '--period',
+        type=int,
+        default=30,
+        help='获取数据的时段长度'
+    )
+    parser.add_argument(
+        '--end_time_to_now',
+        type=int,
+        default=0,
+        help='指定获取数据时段的结束时间，使用距今几天来定义（默认为 0 ，即今天）'
+    )
     args = parser.parse_args()
 
-    fetch_all_intervals(args.symbol, args.lookback_days, args.end_time, args.save_path)
+    fetch_all_intervals(args.symbol, args.period)

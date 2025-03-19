@@ -24,4 +24,9 @@ Prediction for COIN event contract. Let's play probability with gambling!
         - XGBoost
 
 - 2025.3.18 v0.2.1 @decision_tree
-    - XGboost.py
+    - XGboost.py init
+    - XGboost.py 改进
+        - 合并 horizon - base
+        - 平稳化数据
+        - 查找数据文件，只看 symbol + interval，剩下的参数无关，匹配到的第一个就行
+

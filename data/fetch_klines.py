@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import requests
 from datetime import datetime
+from ..utils import period_to_milliseconds
 
 # Binance Futures API URL
 BASE_URL = "https://fapi.binance.com/fapi/v1/klines"
@@ -13,20 +14,6 @@ BASE_URL = "https://fapi.binance.com/fapi/v1/klines"
 INTERVALS = [
     "1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "12h", "1d"
 ]
-
-# Convert period to milliseconds
-def period_to_milliseconds(period):
-    num = int(period[:-1])
-    unit = period[-1]
-    
-    if unit == "d":
-        return num * 24 * 60 * 60 * 1000
-    elif unit == "h":
-        return num * 60 * 60 * 1000
-    elif unit == "m":
-        return num * 60 * 1000
-    else:
-        raise ValueError("Invalid period format, use e.g., '365d', '48h'")
 
 # Fetch historical K-lines
 def fetch_klines(symbol, interval, period):
